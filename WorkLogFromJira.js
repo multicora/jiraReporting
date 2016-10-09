@@ -15,18 +15,20 @@ function getReport(config, cb) {
     logTxt = '';
 
   jQuery.ajax({
-    url: jiraUrl + '/rest/api/2/search',
+    url: jiraUrl + '/rest/api/2/search?expand=names',
     data: {
       "jql": 'project = ' + project + ' AND worklogAuthor = ' + user + ' and Sprint = ' + sprint + ' AND worklogDate >= "' + from + '" AND worklogDate <= "' + to + '"',
       "startAt": 0,
       "maxResults": 50
     },
     success: function(res) {
+      var storyPointsFieldName = findCustomField(res.names, 'Story Points');
       // console.log(res);
       if (res.issues.length === 0) {
         cb ? cb('No issues') : console.log('No issues');
       } else {
         res.issues.forEach(function (issue) {
+          var sp = (issue.fields[storyPointsFieldName] || 'No ') + 'sp';
           issuesNumber++;
           jQuery.ajax({
             url: jiraUrl + '/rest/api/2/issue/' + issue.key + '/worklog',
@@ -45,7 +47,7 @@ function getReport(config, cb) {
 
                 if (started.getTime() >= fromDate.getTime() && started.getTime() <= toDate.getTime()) {
                   // console.log(issue.key + ': ' + log.timeSpentSeconds / 3600 + 'h;');
-                  logTxt += '\n' + issue.key + ': ' + log.timeSpentSeconds / 3600 + 'h;';
+                  logTxt += '\n' + issue.key + ': ' + log.timeSpentSeconds / 3600 + 'h, ' + sp + ';';
                   // console.log(log.timeSpentSeconds);
                   timeSpentSeconds += log.timeSpentSeconds;
                 }
@@ -65,4 +67,14 @@ function getReport(config, cb) {
       }
     }
   });
+}
+
+function findCustomField(namesMap, name) {
+  for (var field in namesMap) {
+    if(namesMap[field] === name) {
+      return field;
+    }
+  }
+
+  return null;
 }
