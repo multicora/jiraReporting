@@ -16,28 +16,30 @@
         min-width: 50px;
       }
 
-      .user-btn {
+      .block {
+        margin: 10px;
+      }
+
+      .button {
         display: block;
       }
     </style>
   </head>
   <body>
-    <div>
-      <label for="#sprint">Sprint</label>
-      <input type="number" id="sprint">
-    </div>
-    <div>
+    <select class="block" id="projects">
+    </select>
+    <div class="block">
       <label for="#from">From</label>
       <input type="date" id="from">
     </div>
-    <div>
+    <div class="block">
       <label for="#to">To</label>
       <input type="date" id="to">
     </div>
-    <div id="users">
+    <div id="users" class="block">
       Loading...
     </div>
-    <pre class="report">
+    <pre class="report block">
     </pre>
 
   </body>

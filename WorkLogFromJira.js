@@ -12,12 +12,19 @@ function getReport(config, cb) {
     workLogs = [],
     timeSpentSeconds = 0,
     issuesNumber = 0,
-    logTxt = '';
+    logTxt = '',
+    jql = 'project = ' + project + ' AND worklogAuthor = ' + user;
+
+  if (sprint) {
+    jql += ' and Sprint = ' + sprint;
+  }
+
+  jql += ' AND worklogDate >= "' + from + '" AND worklogDate <= "' + to + '"';
 
   jQuery.ajax({
     url: jiraUrl + '/rest/api/2/search?expand=names',
     data: {
-      "jql": 'project = ' + project + ' AND worklogAuthor = ' + user + ' and Sprint = ' + sprint + ' AND worklogDate >= "' + from + '" AND worklogDate <= "' + to + '"',
+      "jql": jql,
       "startAt": 0,
       "maxResults": 50
     },
@@ -77,4 +84,16 @@ function findCustomField(namesMap, name) {
   }
 
   return null;
+}
+
+function getProjects(jiraUrl) {
+  return jQuery.ajax({
+    url: jiraUrl + '/rest/api/2/project'
+  });
+}
+
+function getUsers(jiraUrl) {
+  return jQuery.ajax({
+    url: jiraUrl + '/rest/api/latest/user/search?startAt=0&maxResults=1000&username=%'
+  });
 }
